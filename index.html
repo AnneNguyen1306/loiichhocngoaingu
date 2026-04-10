@@ -16,7 +16,7 @@
         .container { max-width: 800px; margin: 0 auto; }
         h1 { text-align: center; color: #2c3e50; font-size: 1.8em; margin-bottom: 20px; line-height: 1.4;}
         
-        /* Bảng điểm ghim trên cùng (Sticky Banner) */
+        /* Bảng điểm ghim trên cùng */
         .score-banner {
             position: sticky;
             top: 10px;
@@ -67,14 +67,16 @@
             animation: fadeIn 0.4s ease-in-out;
             font-size: 0.95em;
         }
-        .explanation strong { color: #d35400; }
+        .explanation strong { color: #d35400; font-size: 1.1em;}
+        .explanation .meaning { margin-bottom: 10px; color: #34495e; }
         
-        /* Label Hán Việt */
+        /* Label Hán Việt tách chữ */
         .han-viet-box {
-            display: inline-block; background: #fef9e7; color: #b9770e; 
-            padding: 6px 12px; border-radius: 5px; font-size: 0.95em; 
-            margin-top: 10px; font-weight: 600; border: 1px solid #f5b041;
+            display: block; background: #fef9e7; color: #b9770e; 
+            padding: 12px; border-radius: 5px; font-size: 0.95em; 
+            margin-top: 10px; border: 1px solid #f5b041;
         }
+        .han-viet-box span { font-weight: bold; color: #d35400; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -85,74 +87,72 @@
 <body>
 
 <div class="container">
-    <h1>Bài tập Trắc nghiệm: 50 Từ vựng Khó (B2~C1)<br> Chủ đề: Lợi ích học ngôn ngữ</h1>
+    <h1>Bài tập Trắc nghiệm: 50 Từ vựng Khó (B2~C1)<br> Giải thích chi tiết gốc Hán Hàn</h1>
     <div class="score-banner" id="score-text">Điểm: 0 / 0 (Đã làm: 0/50)</div>
     <div id="quiz-container"></div>
 </div>
 
 <script>
-// Dữ liệu 50 từ vựng với giải thích chi tiết Hán Việt (không dùng chữ Hán)
+// Dữ liệu 50 từ vựng với giải thích bóc tách Hán Hàn
 const vocabList = [
-    { kr: "한파", vn: "Đợt rét đậm", detail: "Chỉ đợt không khí lạnh khắc nghiệt vào mùa đông.", han: "Hán Việt: Hàn ba (Hàn = lạnh, Ba = làn sóng. Nghĩa là làn sóng lạnh)." },
-    { kr: "유행하다", vn: "Lưu hành, lây lan", detail: "Sự phổ biến rộng rãi (như xu hướng thời trang) hoặc sự lây lan (dịch bệnh).", han: "Hán Việt: Lưu hành (Lưu = trôi chảy/lan ra, Hành = đi/di chuyển)." },
-    { kr: "효능", vn: "Hiệu năng, công dụng", detail: "Tác dụng, hiệu quả tốt của một loại thực phẩm hay thuốc.", han: "Hán Việt: Hiệu năng (Hiệu = hiệu quả, Năng = khả năng)." },
-    { kr: "두뇌", vn: "Trí não, đầu óc", detail: "Cơ quan thần kinh trung ương, dùng để chỉ tư duy, trí óc.", han: "Hán Việt: Đầu não (Đầu = cái đầu, Não = bộ não)." },
-    { kr: "지능", vn: "Trí năng, trí thông minh", detail: "Khả năng nhận thức, hiểu biết và giải quyết vấn đề.", han: "Hán Việt: Trí năng (Trí = trí tuệ/hiểu biết, Năng = năng lực)." },
-    { kr: "추적", vn: "Sự theo dõi, truy vết", detail: "Việc bám theo dấu vết để tìm ra hoặc quan sát sự thay đổi theo thời gian.", han: "Hán Việt: Truy tích (Truy = đuổi theo, Tích = dấu vết)." },
-    { kr: "인지하다", vn: "Nhận thức, nhận biết", detail: "Khả năng nhận ra, hiểu rõ sự việc thông qua tư duy.", han: "Hán Việt: Nhận tri (Nhận = nhận ra, Tri = biết/hiểu)." },
-    { kr: "치매", vn: "Chứng mất trí nhớ", detail: "Căn bệnh suy giảm trí nhớ thường gặp ở người già.", han: "Hán Việt: Si ngốc/Si mê (Si = ngu muội/ngốc nghếch, Ngốc/Mê = lú lẫn)." },
-    { kr: "예방하다", vn: "Dự phòng, phòng ngừa", detail: "Ngăn chặn trước những việc xấu, bệnh tật xảy ra.", han: "Hán Việt: Dự phòng (Dự = chuẩn bị trước, Phòng = phòng ngừa)." },
-    { kr: "의학", vn: "Y học", detail: "Ngành khoa học nghiên cứu về bệnh tật và sức khỏe.", han: "Hán Việt: Y học (Y = chữa bệnh, Học = ngành học)." },
-    { kr: "발달하다", vn: "Phát triển", detail: "Sự tiến bộ, lớn mạnh lên (thường dùng cho khoa học, cơ thể, trí não).", han: "Hán Việt: Phát đạt (Phát = mở rộng/bùng nổ, Đạt = đạt tới đỉnh cao)." },
-    { kr: "연령대", vn: "Độ tuổi, nhóm tuổi", detail: "Chỉ một khoảng tuổi nhất định (ví dụ: nhóm tuổi 10-20, 20-30...).", han: "Hán Việt: Niên linh đại (Niên = năm, Linh = tuổi tác, Đại = nhóm/vùng/khoảng)." },
-    { kr: "스펙트럼", vn: "Phổ, phạm vi rộng", detail: "Phạm vi rộng rãi, đa dạng các nhóm người hoặc ý kiến.", han: "Từ mượn tiếng Anh: Spectrum." },
-    { kr: "환갑", vn: "Hoàn giáp, lễ 60 tuổi", detail: "Lễ mừng thọ 60 tuổi, đánh dấu một vòng luân hồi của can chi.", han: "Hán Việt: Hoàn giáp (Hoàn = quay trở lại, Giáp = năm giáp (trong 60 hoa giáp))." },
-    { kr: "모국어", vn: "Tiếng mẹ đẻ", detail: "Ngôn ngữ gốc của quốc gia mình sinh ra.", han: "Hán Việt: Mẫu quốc ngữ (Mẫu = mẹ, Quốc = nước, Ngữ = tiếng nói)." },
-    { kr: "필수", vn: "Sự tất yếu, bắt buộc", detail: "Điều không thể thiếu, bắt buộc phải có.", han: "Hán Việt: Tất tu (Tất = ắt hẳn/chắc chắn, Tu = phải làm/đòi hỏi)." },
-    { kr: "동일하다", vn: "Đồng nhất, giống hệt nhau", detail: "Hoàn toàn giống nhau, không có sự khác biệt.", han: "Hán Việt: Đồng nhất (Đồng = cùng nhau, Nhất = một/giống như một)." },
-    { kr: "압박", vn: "Sự đè nén, áp lực", detail: "Sự áp chế, tạo áp lực nặng nề về tâm lý hoặc vật lý.", han: "Hán Việt: Áp bách (Áp = đè xuống, Bách = thúc ép/bức bách)." },
-    { kr: "계기", vn: "Cơ hội, bước ngoặt", detail: "Duyên cớ, nguyên nhân dẫn đến sự thay đổi.", han: "Hán Việt: Khế cơ (Khế = sự gắn kết/hợp đồng, Cơ = cơ hội/bước ngoặt)." },
-    { kr: "동기부여", vn: "Sự tạo động lực", detail: "Việc tiếp thêm lý do, sức mạnh để làm một việc gì đó.", han: "Hán Việt + Thuần Hàn: Động cơ (Lý do thúc đẩy) + 부여 (Cấp cho/Trao cho)." },
-    { kr: "이성적", vn: "Mang tính lý trí", detail: "Suy nghĩ bằng não bộ, logic, thay vì cảm xúc.", han: "Hán Việt: Lý tính đích (Lý = nguyên lý/đúng đắn, Tính = bản tính, Đích = mang tính)." },
-    { kr: "합리적", vn: "Mang tính hợp lý", detail: "Cách giải quyết phù hợp với logic và lý lẽ nhất.", han: "Hán Việt: Hợp lý đích (Hợp = phù hợp, Lý = đạo lý)." },
-    { kr: "충동구매", vn: "Mua sắm bốc đồng", detail: "Việc mua sắm không có kế hoạch, mua vì cảm xúc nhất thời.", han: "Hán Việt: Xung động cấu mãi (Xung động = bốc đồng/mất kiểm soát, Cấu mãi = mua sắm)." },
-    { kr: "순간적", vn: "Mang tính khoảnh khắc", detail: "Chỉ xảy ra trong một chốc lát, rất nhanh.", han: "Hán Việt: Thuấn gian đích (Thuấn = cái chớp mắt, Gian = thời gian/khoảng trống)." },
-    { kr: "욕구", vn: "Dục cầu, sự ham muốn", detail: "Mong muốn mãnh liệt đòi hỏi được thỏa mãn (như ăn, ngủ, mua sắm).", han: "Hán Việt: Dục cầu (Dục = lòng tham/ham muốn, Cầu = mong mỏi)." },
-    { kr: "구매", vn: "Sự mua sắm", detail: "Hành động mua hàng hóa.", han: "Hán Việt: Cấu mãi (Cấu = sắm sửa, Mãi = mua)." },
-    { kr: "잠잠해지다", vn: "Lắng xuống, dịu đi", detail: "Cảm xúc hoặc một sự kiện ồn ào từ từ trở nên yên tĩnh lại.", han: "Từ thuần Hàn." },
-    { kr: "해결책", vn: "Giải pháp", detail: "Phương pháp để xử lý, giải quyết một vấn đề.", han: "Hán Việt: Giải quyết sách (Giải quyết = tháo gỡ, Sách = mưu kế/cách thức)." },
-    { kr: "관점", vn: "Quan điểm", detail: "Góc nhìn, cách suy nghĩ về một vấn đề.", han: "Hán Việt: Quan điểm (Quan = nhìn, Điểm = vị trí/trọng tâm)." },
-    { kr: "시각", vn: "Góc nhìn, thị giác", detail: "Nghĩa đen là thị giác. Nghĩa bóng là cách nhìn nhận thế giới.", han: "Hán Việt: Thị giác (Thị = nhìn, Giác = cảm giác/nhận biết)." },
-    { kr: "영혼", vn: "Linh hồn", detail: "Phần tâm hồn, tinh thần bên trong con người.", han: "Hán Việt: Linh hồn." },
-    { kr: "해방감", vn: "Cảm giác được giải phóng", detail: "Cảm giác nhẹ nhõm, tự do khi thoát khỏi áp lực.", han: "Hán Việt: Giải phóng cảm (Giải phóng = cởi trói/làm tự do, Cảm = cảm giác)." },
-    { kr: "포근함", vn: "Sự ấm áp, êm ái", detail: "Cảm giác mềm mại, ấm cúng, thư giãn về mặt tinh thần hoặc xúc giác.", han: "Từ thuần Hàn." },
-    { kr: "단조롭다", vn: "Đơn điệu, tẻ nhạt", detail: "Sự việc cứ lặp đi lặp lại không có gì mới mẻ.", han: "Hán Hàn kết hợp: Đơn điệu (Một màu/không đổi) + đuôi thuần Hàn '롭다'." },
-    { kr: "여유", vn: "Sự thong thả, dư dả", detail: "Có dư dả về thời gian, tiền bạc hoặc tâm trí không bị vội vã.", han: "Hán Việt: Dư dụ (Dư = thừa ra, Dụ = khoan thai/rộng rãi)." },
-    { kr: "검붉다", vn: "Đỏ sẫm", detail: "Màu đỏ pha đen, đỏ sẫm.", han: "Từ thuần Hàn (Ghép từ 검다 - đen và 붉다 - đỏ)." },
-    { kr: "불그스름하다", vn: "Đỏ ửng, hơi đỏ", detail: "Màu đỏ nhạt, ửng đỏ nhẹ nhàng.", han: "Từ thuần Hàn." },
-    { kr: "전통적", vn: "Mang tính truyền thống", detail: "Thuộc về phong tục, tập quán lâu đời.", han: "Hán Việt: Truyền thống đích (Truyền = trao lại, Thống = dòng dõi/nền tảng)." },
-    { kr: "우아하다", vn: "Ưu nhã, thanh lịch", detail: "Vẻ đẹp sang trọng, thanh tao, nhẹ nhàng.", han: "Hán Việt: Ưu nhã (Ưu = vượt trội/đẹp, Nhã = thanh cao/đúng đắn)." },
-    { kr: "단단하다", vn: "Cứng rắn, vững chắc", detail: "Sự chắc chắn, không dễ bị bẻ gãy hay phá vỡ (vật lý hoặc tâm lý).", han: "Từ thuần Hàn." },
-    { kr: "남성명사", vn: "Danh từ giống nam", detail: "Loại từ vựng được quy định giới tính nam trong một số ngôn ngữ (như tiếng Pháp, Đức).", han: "Hán Việt: Nam tính danh từ." },
-    { kr: "여성명사", vn: "Danh từ giống nữ", detail: "Loại từ vựng được quy định giới tính nữ trong một số ngôn ngữ.", han: "Hán Việt: Nữ tính danh từ." },
-    { kr: "짐작이 가다", vn: "Suy đoán được", detail: "Cảm nhận, ước lượng được tình huống, lờ mờ đoán ra.", han: "Hán Việt + Thuần Hàn: Châm chước (짐작 - tự lường sức/ước đoán) + 가다." },
-    { kr: "눈치", 단어: "눈치", vn: "Sự ý tứ", detail: "Khả năng đọc hiểu bầu không khí, đoán ý người khác qua ánh mắt, hành động.", han: "Từ thuần Hàn (Bắt nguồn từ 눈 - con mắt)." },
-    { kr: "척하면 척", vn: "Hiểu ngay lập tức", detail: "Chỉ cần một gợi ý hoặc cái liếc mắt là đã hiểu ý nhau ngay (sự ăn ý).", han: "Từ thuần Hàn (Thành ngữ tượng thanh/tượng hình)." },
-    { kr: "촉이 좋다", vn: "Có trực giác tốt", detail: "Sự linh cảm sắc bén, đoán trước được việc sẽ xảy ra.", han: "Hán Việt + Thuần Hàn: Xúc (촉 - Sự chạm vào/cảm nhận/trực giác) + 좋다 (Tốt)." },
-    { kr: "파악하다", vn: "Nắm bắt, hiểu rõ", detail: "Nhìn thấu và nắm vững toàn bộ tình hình, mạch truyện.", han: "Hán Việt: Bả ác (Bả = cầm nắm/giữ lấy, Ác = nắm chặt)." },
-    { kr: "서툴다", vn: "Vụng về, lóng ngóng", detail: "Làm việc gì đó chưa quen, còn vụng về, thiếu kinh nghiệm.", han: "Từ thuần Hàn." },
-    { kr: "안쓰럽다", vn: "Đáng thương, tội nghiệp", detail: "Cảm giác nhìn ai đó thấy xót xa, thương cảm trong lòng.", han: "Từ thuần Hàn." },
-    { kr: "꾸준히", vn: "Một cách đều đặn, kiên trì", detail: "Làm việc gì đó liên tục, không bỏ cuộc giữa chừng.", han: "Từ thuần Hàn." }
+    { kr: "한파", vn: "Đợt rét đậm", detail: "Chỉ đợt không khí lạnh khắc nghiệt vào mùa đông.", han: "<span>한</span> (Hàn: lạnh) + <span>파</span> (Ba: làn sóng) ➔ Làn sóng lạnh." },
+    { kr: "유행하다", vn: "Lưu hành, lây lan", detail: "Sự phổ biến rộng rãi (như xu hướng) hoặc sự lây lan (dịch bệnh).", han: "<span>유</span> (Lưu: trôi, lan ra) + <span>행</span> (Hành: đi) ➔ Lan truyền đi." },
+    { kr: "효능", vn: "Hiệu năng, công dụng", detail: "Tác dụng, hiệu quả tốt của một loại thực phẩm hay thuốc.", han: "<span>효</span> (Hiệu: hiệu quả) + <span>능</span> (Năng: khả năng) ➔ Khả năng mang lại hiệu quả." },
+    { kr: "두뇌", vn: "Trí não, đầu óc", detail: "Cơ quan thần kinh trung ương, dùng để chỉ tư duy.", han: "<span>두</span> (Đầu: cái đầu) + <span>뇌</span> (Não: bộ não) ➔ Não bộ." },
+    { kr: "지능", vn: "Trí năng, thông minh", detail: "Khả năng nhận thức, hiểu biết và giải quyết vấn đề.", han: "<span>지</span> (Trí: trí tuệ) + <span>능</span> (Năng: năng lực) ➔ Năng lực trí tuệ." },
+    { kr: "추적", vn: "Sự theo dõi, truy vết", detail: "Việc bám theo dấu vết để tìm ra hoặc quan sát sự thay đổi.", han: "<span>추</span> (Truy: đuổi theo) + <span>적</span> (Tích: dấu vết) ➔ Đuổi theo dấu vết." },
+    { kr: "인지하다", vn: "Nhận thức, nhận biết", detail: "Khả năng nhận ra, hiểu rõ sự việc thông qua tư duy.", han: "<span>인</span> (Nhận: nhận ra) + <span>지</span> (Tri: biết) ➔ Nhận biết." },
+    { kr: "치매", vn: "Chứng mất trí nhớ", detail: "Căn bệnh suy giảm trí nhớ thường gặp ở người già.", han: "<span>치</span> (Si: ngu ngốc) + <span>매</span> (Ngốc/Mê: lú lẫn) ➔ Bệnh lú lẫn." },
+    { kr: "예방하다", vn: "Dự phòng, phòng ngừa", detail: "Ngăn chặn trước những việc xấu, bệnh tật xảy ra.", han: "<span>예</span> (Dự: trước) + <span>방</span> (Phòng: phòng bị) ➔ Phòng bị trước." },
+    { kr: "의학", vn: "Y học", detail: "Ngành khoa học nghiên cứu về bệnh tật và sức khỏe.", han: "<span>의</span> (Y: chữa bệnh) + <span>학</span> (Học: môn học) ➔ Môn học chữa bệnh." },
+    { kr: "발달하다", vn: "Phát triển", detail: "Sự tiến bộ, lớn mạnh lên (khoa học, cơ thể, trí 두뇌).", han: "<span>발</span> (Phát: mở ra/phát ra) + <span>달</span> (Đạt: đạt tới) ➔ Phát triển đạt đến mức cao." },
+    { kr: "연령대", vn: "Độ tuổi, nhóm tuổi", detail: "Chỉ một khoảng tuổi nhất định (ví dụ: nhóm tuổi 20-30...).", han: "<span>연</span> (Niên: năm) + <span>령</span> (Linh: tuổi) + <span>대</span> (Đại: nhóm/khoảng) ➔ Nhóm tuổi." },
+    { kr: "스펙트럼", vn: "Phổ, phạm vi rộng", detail: "Phạm vi rộng rãi, đa dạng các nhóm người 또는 ý kiến.", han: "🌍 <span>Từ mượn tiếng Anh:</span> Spectrum (Quang phổ/Phạm vi)." },
+    { kr: "환갑", vn: "Lễ mừng thọ 60 tuổi", detail: "Đánh dấu một vòng luân hồi của can chi.", han: "<span>환</span> (Hoàn: quay lại) + <span>갑</span> (Giáp: năm Giáp) ➔ Quay lại năm Giáp (tròn 60 năm)." },
+    { kr: "모국어", vn: "Tiếng mẹ đẻ", detail: "Ngôn ngữ gốc của quốc gia mình sinh ra.", han: "<span>모</span> (Mẫu: mẹ) + <span>국</span> (Quốc: nước) + <span>어</span> (Ngữ: tiếng) ➔ Tiếng của quê mẹ." },
+    { kr: "필수", vn: "Sự tất yếu, bắt buộc", detail: "Điều không thể thiếu, bắt buộc phải có.", han: "<span>필</span> (Tất: ắt phải) + <span>수</span> (Tu: cần dùng/phải có) ➔ Bắt buộc phải có." },
+    { kr: "동일하다", vn: "Đồng nhất, giống hệt", detail: "Hoàn toàn giống nhau, không có sự khác biệt.", han: "<span>동</span> (Đồng: cùng) + <span>일</span> (Nhất: một) ➔ Cùng là một, giống nhau." },
+    { kr: "압박", vn: "Sự đè nén, áp lực", detail: "Sự áp chế, tạo áp lực nặng nề về tâm lý hoặc vật lý.", han: "<span>압</span> (Áp: đè xuống) + <span>박</span> (Bách: thúc ép) ➔ Đè ép." },
+    { kr: "계기", vn: "Cơ hội, bước ngoặt", detail: "Duyên cớ, nguyên nhân dẫn đến sự thay đổi.", han: "<span>계</span> (Khế: gắn kết) + <span>기</span> (Cơ: cơ hội) ➔ Bước ngoặt, cơ duyên." },
+    { kr: "동기부여", vn: "Sự tạo động lực", detail: "Việc tiếp thêm lý do, sức mạnh để làm một việc gì đó.", han: "<span>동</span> (Động: di chuyển) + <span>기</span> (Cơ: mầm mống) + <span>부여</span> (Thuần Hàn: Trao cho) ➔ Cấp cho động cơ." },
+    { kr: "이성적", vn: "Mang tính lý trí", detail: "Suy nghĩ bằng não bộ, logic, thay vì cảm xúc.", han: "<span>이</span> (Lý: lẽ phải) + <span>성</span> (Tính: bản tính) + <span>적</span> (Đích: mang tính) ➔ Thuộc về lý trí." },
+    { kr: "합리적", vn: "Mang tính hợp lý", detail: "Cách giải quyết phù hợp với logic và lý lẽ nhất.", han: "<span>합</span> (Hợp: phù hợp) + <span>리</span> (Lý: lẽ phải) + <span>적</span> (Đích: mang tính) ➔ Phù hợp đạo lý." },
+    { kr: "충동구매", vn: "Mua sắm bốc đồng", detail: "Mua sắm không kế hoạch, mua vì cảm xúc nhất thời.", han: "<span>충</span> (Xung: va chạm mạnh) + <span>동</span> (Động: hành động) + <span>구</span> (Cấu: sắm) + <span>매</span> (Mãi: mua) ➔ Mua sắm bốc đồng." },
+    { kr: "순간적", vn: "Mang tính khoảnh khắc", detail: "Chỉ xảy ra trong một chốc lát, rất nhanh.", han: "<span>순</span> (Thuấn: chớp mắt) + <span>간</span> (Gian: khoảng trống) + <span>적</span> (Đích: mang tính) ➔ Trong chớp mắt." },
+    { kr: "욕구", vn: "Sự ham muốn, nhu cầu", detail: "Mong muốn mãnh liệt đòi hỏi được thỏa mãn.", han: "<span>욕</span> (Dục: ham muốn) + <span>구</span> (Cầu: mong mỏi) ➔ Nhu cầu, sự thèm muốn." },
+    { kr: "구매", vn: "Sự mua sắm", detail: "Hành động mua hàng hóa.", han: "<span>구</span> (Cấu: sắm sửa) + <span>매</span> (Mãi: mua) ➔ Mua hàng." },
+    { kr: "잠잠해지다", vn: "Lắng xuống, dịu đi", detail: "Cảm xúc hoặc sự kiện ồn ào từ từ trở nên yên tĩnh lại.", han: "🌱 <span>Từ thuần Hàn:</span> Bắt nguồn từ chữ '잠잠하다' (Yên lặng)." },
+    { kr: "해결책", vn: "Giải pháp", detail: "Phương pháp để xử lý, giải quyết một vấn đề.", han: "<span>해</span> (Giải: tháo gỡ) + <span>결</span> (Quyết: dứt khoát) + <span>책</span> (Sách: cách thức) ➔ Cách tháo gỡ vấn đề." },
+    { kr: "관점", vn: "Quan điểm", detail: "Góc nhìn, cách suy nghĩ về một vấn đề.", han: "<span>관</span> (Quan: nhìn) + <span>점</span> (Điểm: vị trí) ➔ Điểm nhìn." },
+    { kr: "시각", vn: "Góc nhìn, thị giác", detail: "Nghĩa đen là thị giác. Nghĩa bóng là cách nhìn nhận thế giới.", han: "<span>시</span> (Thị: nhìn) + <span>각</span> (Giác: góc độ) ➔ Góc độ quan sát." },
+    { kr: "영혼", vn: "Linh hồn", detail: "Phần tâm hồn, tinh thần bên trong con người.", han: "<span>영</span> (Linh: linh thiêng) + <span>혼</span> (Hồn: linh hồn) ➔ Linh hồn." },
+    { kr: "해방감", vn: "Cảm giác được giải phóng", detail: "Cảm giác nhẹ nhõm, tự do khi thoát khỏi áp lực.", han: "<span>해</span> (Giải: cởi ra) + <span>방</span> (Phóng: thả ra) + <span>감</span> (Cảm: cảm giác) ➔ Cảm giác tự do." },
+    { kr: "포근함", vn: "Sự ấm áp, êm ái", detail: "Cảm giác mềm mại, ấm cúng, thư giãn.", han: "🌱 <span>Từ thuần Hàn:</span> Bắt nguồn từ '포근하다' (Ấm áp, êm dịu)." },
+    { kr: "단조롭다", vn: "Đơn điệu, tẻ nhạt", detail: "Sự việc cứ lặp đi lặp lại không có gì mới mẻ.", han: "<span>단</span> (Đơn: một) + <span>조</span> (Điệu: nhịp/giai điệu) + <span>롭다</span> (Đuôi thuần Hàn) ➔ Chỉ có một màu/nhịp." },
+    { kr: "여유", vn: "Sự thong thả, dư dả", detail: "Có dư dả thời gian, tiền bạc hoặc tâm trí không vội vã.", han: "<span>여</span> (Dư: thừa ra) + <span>유</span> (Dụ: khoan thai) ➔ Sự nhàn nhã." },
+    { kr: "검붉다", vn: "Đỏ sẫm", detail: "Màu đỏ pha đen, đỏ tối màu.", han: "🌱 <span>Từ thuần Hàn ghép:</span> 검다 (Đen) + 붉다 (Đỏ)." },
+    { kr: "불그스름하다", vn: "Đỏ ửng, hơi đỏ", detail: "Màu đỏ nhạt, ửng đỏ nhẹ nhàng.", han: "🌱 <span>Từ thuần Hàn:</span> Biểu hiện mức độ màu sắc đỏ nhẹ." },
+    { kr: "전통적", vn: "Mang tính truyền thống", detail: "Thuộc về phong tục, tập quán lâu đời.", han: "<span>전</span> (Truyền: trao lại) + <span>통</span> (Thống: dòng dõi) + <span>적</span> (Đích: mang tính) ➔ Tính truyền thống." },
+    { kr: "우아하다", vn: "Ưu nhã, thanh lịch", detail: "Vẻ đẹp sang trọng, thanh tao, nhẹ nhàng.", han: "<span>우</span> (Ưu: vượt trội/đẹp) + <span>아</span> (Nhã: thanh cao) ➔ Vẻ đẹp nhã nhặn." },
+    { kr: "단단하다", vn: "Cứng rắn, vững chắc", detail: "Sự chắc chắn, không dễ bị bẻ gãy (vật lý/tâm lý).", han: "🌱 <span>Từ thuần Hàn.</span>" },
+    { kr: "남성명사", vn: "Danh từ giống nam", detail: "Loại từ vựng quy định giới tính nam trong một số ngôn ngữ.", han: "<span>남성</span> (Nam tính: giới tính nam) + <span>명사</span> (Danh từ: từ chỉ tên)." },
+    { kr: "여성명사", vn: "Danh từ giống nữ", detail: "Loại từ vựng quy định giới tính nữ trong một số ngôn ngữ.", han: "<span>여성</span> (Nữ tính: giới tính nữ) + <span>명사</span> (Danh từ: từ chỉ tên)." },
+    { kr: "짐작이 가다", vn: "Suy đoán được", detail: "Cảm nhận, ước lượng được tình huống, đoán ra.", han: "<span>짐</span> (Châm: xem xét) + <span>작</span> (Chước: lường/đong) + <span>가다</span> (Thuần Hàn) ➔ Nhắm chừng." },
+    { kr: "눈치", vn: "Sự ý tứ", detail: "Khả năng đoán ý người khác qua ánh mắt, hành động.", han: "🌱 <span>Từ thuần Hàn:</span> Bắt nguồn từ '눈' (Con mắt)." },
+    { kr: "척하면 척", vn: "Hiểu ngay lập tức", detail: "Chỉ cần một gợi ý nhỏ là đã hiểu ý nhau (sự ăn ý).", han: "🌱 <span>Thành ngữ thuần Hàn:</span> Từ tượng thanh/tượng hình." },
+    { kr: "촉이 좋다", vn: "Có trực giác tốt", detail: "Linh cảm sắc bén, đoán trước được việc sẽ xảy ra.", han: "<span>촉</span> (Xúc: sự chạm vào/trực giác) + <span>좋다</span> (Tốt) ➔ Cảm nhận tốt." },
+    { kr: "파악하다", vn: "Nắm bắt, hiểu rõ", detail: "Nhìn thấu và nắm vững toàn bộ tình hình.", han: "<span>파</span> (Bả: cầm/nắm) + <span>악</span> (Ác: nắm chặt) ➔ Nắm bắt vấn đề." },
+    { kr: "서툴다", vn: "Vụng về, lóng ngóng", detail: "Làm việc gì đó chưa quen, thiếu kinh nghiệm.", han: "🌱 <span>Từ thuần Hàn.</span>" },
+    { kr: "안쓰럽다", vn: "Đáng thương", detail: "Cảm giác nhìn ai đó thấy xót xa trong lòng.", han: "🌱 <span>Từ thuần Hàn.</span>" },
+    { kr: "꾸준히", vn: "Đều đặn, kiên trì", detail: "Làm việc gì đó liên tục, không bỏ cuộc.", han: "🌱 <span>Từ thuần Hàn.</span>" }
 ];
 
 // Tạo cấu trúc câu hỏi có xáo trộn đáp án
 const quizData = vocabList.map((item, index) => {
-    // Rút ra 3 đáp án sai ngẫu nhiên
     let pool = vocabList.filter((_, i) => i !== index);
     pool.sort(() => 0.5 - Math.random());
     let distractors = [pool[0].vn, pool[1].vn, pool[2].vn];
     
-    // Gộp và xáo trộn 4 đáp án
     let options = [...distractors, item.vn];
     options.sort(() => 0.5 - Math.random());
     
@@ -170,7 +170,7 @@ let score = 0;
 let answeredCount = 0;
 const container = document.getElementById('quiz-container');
 
-// Hàm render toàn bộ 50 câu hỏi theo dạng cuộn dọc
+// Render 50 câu hỏi
 function renderQuiz() {
     let html = '';
     quizData.forEach((q, qIndex) => {
@@ -184,9 +184,9 @@ function renderQuiz() {
                 `).join('')}
             </div>
             <div class="explanation" id="exp-${qIndex}" style="display:none;">
-                <strong>Đáp án đúng: ${q.answerText}</strong><br><br>
-                <em>Giải nghĩa:</em> ${q.detail}<br>
-                <div class="han-viet-box">🔍 ${q.han}</div>
+                <strong>Đáp án đúng: ${q.answerText}</strong>
+                <div class="meaning"><em>Giải nghĩa:</em> ${q.detail}</div>
+                <div class="han-viet-box">🔍 Phân tích: ${q.han}</div>
             </div>
         </div>
         `;
@@ -194,35 +194,30 @@ function renderQuiz() {
     container.innerHTML = html;
 }
 
-// Xử lý logic khi bấm chọn đáp án
+// Xử lý chấm điểm
 function checkAns(qIndex, selectedIndex, btnElement) {
     const q = quizData[qIndex];
     const optionsDiv = document.getElementById(`opts-${qIndex}`);
     const buttons = optionsDiv.querySelectorAll('.opt-btn');
     
-    // Khóa các nút lại
     buttons.forEach((btn, idx) => {
         btn.disabled = true;
         if (idx === q.correctIndex) {
-            btn.classList.add('correct'); // Đáp án đúng tô xanh
+            btn.classList.add('correct');
         } else if (idx === selectedIndex) {
-            btn.classList.add('wrong');   // Nếu chọn sai thì tô đỏ
+            btn.classList.add('wrong');
         }
     });
     
-    // Cập nhật điểm
     answeredCount++;
     if (selectedIndex === q.correctIndex) {
         score++;
     }
     
     document.getElementById('score-text').innerText = `Điểm: ${score} / ${answeredCount} (Đã làm: ${answeredCount}/50)`;
-    
-    // Mở khung giải thích chi tiết có Hán Việt
     document.getElementById(`exp-${qIndex}`).style.display = 'block';
 }
 
-// Chạy script
 window.onload = renderQuiz;
 </script>
 
